@@ -4,38 +4,236 @@
   <meta charset="UTF-8">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { width: 360px; font-family: 'Segoe UI', sans-serif; background: #f8f9fa; }
-    .header { background: #4a90d9; color: white; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; }
-    .header h1 { font-size: 15px; font-weight: 600; }
-    .header span { font-size: 12px; opacity: 0.85; }
-    .notes-list { max-height: 320px; overflow-y: auto; }
-    .note-item { background: white; margin: 8px; padding: 10px 12px; border-radius: 8px; border-left: 3px solid #4a90d9; box-shadow: 0 1px 3px rgba(0,0,0,0.08); position: relative; }
-    .note-item p { font-size: 13px; color: #333; line-height: 1.5; word-break: break-all; }
-    .note-item .time { font-size: 11px; color: #999; margin-top: 4px; }
-    .note-item .delete-btn { position: absolute; right: 8px; top: 8px; background: none; border: none; color: #ccc; cursor: pointer; font-size: 14px; }
-    .note-item .delete-btn:hover { color: #e74c3c; }
-    .input-area { padding: 10px; background: white; border-top: 1px solid #eee; }
-    .input-area textarea { width: 100%; height: 60px; border: 1px solid #ddd; border-radius: 8px; padding: 8px; font-size: 13px; resize: none; outline: none; font-family: inherit; }
-    .input-area textarea:focus { border-color: #4a90d9; }
-    .input-area button { width: 100%; margin-top: 8px; padding: 8px; background: #4a90d9; color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
-    .input-area button:hover { background: #357abd; }
-    .empty { text-align: center; padding: 40px 20px; color: #aaa; font-size: 13px; }
-    .footer { text-align: center; padding: 6px; font-size: 11px; color: #ccc; }
+    body { width: 380px; font-family: 'Segoe UI', sans-serif; font-size: 14px; }
+    body.light { background: #f0f2f5; }
+    body.dark  { background: #1a1a2e; color: #e0e0e0; }
+
+    /* ── Header ── */
+    .header {
+      padding: 14px 16px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid;
+    }
+    body.light .header { background: #4a90d9; border-color: #357abd; }
+    body.dark  .header { background: #16213e; border-color: #2a2a4a; }
+    .header-icon { font-size: 20px; }
+    .header h1 { flex: 1; font-size: 15px; font-weight: 600; color: #fff; }
+    .dark-toggle {
+      background: rgba(255,255,255,0.2); border: none; border-radius: 6px;
+      padding: 4px 8px; cursor: pointer; font-size: 13px; color: #fff;
+      transition: background 0.2s;
+    }
+    .dark-toggle:hover { background: rgba(255,255,255,0.35); }
+
+    /* ── Search bar ── */
+    .search-bar {
+      padding: 8px 12px;
+      border-bottom: 1px solid;
+    }
+    body.light .search-bar { background: #fff; border-color: #eee; }
+    body.dark  .search-bar { background: #16213e; border-color: #2a2a4a; }
+    .search-wrap { position: relative; }
+    .search-wrap input {
+      width: 100%; padding: 7px 10px 7px 32px; border-radius: 8px;
+      border: 1px solid; font-size: 13px; outline: none;
+      transition: border-color 0.2s;
+    }
+    body.light .search-wrap input { background: #f8f9fa; border-color: #ddd; color: #333; }
+    body.dark  .search-wrap input { background: #1a1a2e; border-color: #3a3a5a; color: #e0e0e0; }
+    body.light .search-wrap input:focus { border-color: #4a90d9; }
+    body.dark  .search-wrap input:focus { border-color: #6c63ff; }
+    .search-icon {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      font-size: 13px; opacity: 0.5;
+    }
+    body.dark .search-icon { color: #888; }
+
+    /* ── Notes list ── */
+    .notes-list { max-height: 300px; overflow-y: auto; }
+    body.light .notes-list { background: #f0f2f5; }
+    body.dark  .notes-list { background: #1a1a2e; }
+
+    .empty {
+      text-align: center; padding: 40px 20px;
+      color: #aaa; font-size: 13px;
+    }
+    body.dark .empty { color: #555; }
+
+    /* ── Note item ── */
+    .note-item {
+      margin: 8px; border-radius: 10px; padding: 10px 12px;
+      border-left: 4px solid #4a90d9; position: relative;
+      border-top: 1px solid; border-right: 1px solid; border-bottom: 1px solid;
+      transition: box-shadow 0.2s;
+    }
+    body.light .note-item {
+      background: #fff; border-color: #eee;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    body.dark .note-item { background: #232340; border-color: #2a2a4a; }
+    body.light .note-item:hover { box-shadow: 0 2px 8px rgba(74,144,217,0.15); }
+    body.dark  .note-item:hover { box-shadow: 0 2px 8px rgba(108,99,255,0.2); }
+
+    .note-item.pinned { border-left-color: #f39c12; }
+    body.light .note-item.pinned { background: #fffbf0; }
+    body.dark  .note-item.pinned { background: #2a2218; }
+
+    .note-top {
+      display: flex; align-items: flex-start; gap: 4px;
+    }
+    .note-text {
+      flex: 1; font-size: 13px; line-height: 1.55;
+      word-break: break-all; white-space: pre-wrap;
+    }
+    body.light .note-text { color: #333; }
+    body.dark  .note-text { color: #d0d0d0; }
+
+    .pin-btn {
+      background: none; border: none; cursor: pointer;
+      font-size: 14px; padding: 2px 4px; border-radius: 4px;
+      opacity: 0.4; transition: opacity 0.2s;
+    }
+    .pin-btn:hover, .pin-btn.active { opacity: 1; }
+    body.light .pin-btn { color: #f39c12; }
+    body.dark  .pin-btn { color: #f39c12; }
+
+    .note-meta {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 6px; gap: 8px;
+    }
+    .note-time {
+      font-size: 11px;
+    }
+    body.light .note-time { color: #bbb; }
+    body.dark  .note-time { color: #555; }
+
+    .note-chars {
+      font-size: 11px;
+    }
+    body.light .note-chars { color: #ccc; }
+    body.dark  .note-chars { color: #444; }
+
+    .delete-btn {
+      position: absolute; right: 8px; top: 8px;
+      background: none; border: none; cursor: pointer;
+      font-size: 13px; padding: 2px 5px; border-radius: 4px;
+      opacity: 0; transition: opacity 0.2s, color 0.2s;
+    }
+    body.light .delete-btn { color: #ccc; }
+    body.dark  .delete-btn { color: #555; }
+    .note-item:hover .delete-btn { opacity: 1; }
+    .delete-btn:hover { color: #e74c3c !important; }
+
+    /* ── Input area ── */
+    .input-area { padding: 10px 12px; border-top: 1px solid; }
+    body.light .input-area { background: #fff; border-color: #eee; }
+    body.dark  .input-area { background: #16213e; border-color: #2a2a4a; }
+
+    .input-area textarea {
+      width: 100%; height: 64px; border-radius: 8px; padding: 8px 10px;
+      font-size: 13px; resize: none; outline: none; font-family: inherit;
+      border: 1px solid; transition: border-color 0.2s;
+    }
+    body.light .input-area textarea { background: #f8f9fa; border-color: #ddd; color: #333; }
+    body.dark  .input-area textarea { background: #1a1a2e; border-color: #3a3a5a; color: #e0e0e0; }
+    body.light .input-area textarea:focus { border-color: #4a90d9; }
+    body.dark  .input-area textarea:focus { border-color: #6c63ff; }
+
+    .input-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; gap: 8px; }
+    .char-count { font-size: 11px; }
+    body.light .char-count { color: #bbb; }
+    body.dark  .char-count { color: #555; }
+
+    .add-btn {
+      padding: 7px 18px; border: none; border-radius: 8px; font-size: 13px;
+      font-weight: 600; cursor: pointer; transition: opacity 0.2s, background 0.2s;
+    }
+    body.light .add-btn { background: #4a90d9; color: #fff; }
+    body.dark  .add-btn { background: #6c63ff; color: #fff; }
+    .add-btn:hover { opacity: 0.85; }
+
+    /* ── Action bar ── */
+    .action-bar {
+      padding: 8px 12px; border-top: 1px solid; display: flex; gap: 6px;
+    }
+    body.light .action-bar { background: #fff; border-color: #eee; }
+    body.dark  .action-bar { background: #16213e; border-color: #2a2a4a; }
+
+    .action-btn {
+      flex: 1; padding: 6px; border: 1px solid; border-radius: 7px;
+      font-size: 12px; cursor: pointer; text-align: center;
+      font-family: inherit; transition: all 0.2s;
+    }
+    body.light .action-btn { background: #f8f9fa; border-color: #ddd; color: #555; }
+    body.dark  .action-btn { background: #1a1a2e; border-color: #3a3a5a; color: #999; }
+    .action-btn:hover { opacity: 0.8; }
+    body.light .action-btn:hover { background: #eef2f7; }
+    body.dark  .action-btn:hover { background: #232340; }
+
+    /* Hidden file inputs */
+    input[type="file"] { display: none; }
+
+    /* Scrollbar */
+    .notes-list::-webkit-scrollbar { width: 4px; }
+    .notes-list::-webkit-scrollbar-thumb { background: rgba(74,144,217,0.3); border-radius: 4px; }
+    body.dark .notes-list::-webkit-scrollbar-thumb { background: rgba(108,99,255,0.3); }
+
+    /* Stats bar */
+    .stats-bar {
+      padding: 4px 12px; font-size: 11px;
+      display: flex; justify-content: space-between;
+    }
+    body.light .stats-bar { background: #f0f2f5; color: #aaa; }
+    body.dark  .stats-bar { background: #1a1a2e; color: #555; }
   </style>
 </head>
-<body>
+<body class="light">
+  <!-- Header -->
   <div class="header">
-    <h1>📝 快速笔记</h1>
-    <span id="count">0 条</span>
+    <span class="header-icon">📝</span>
+    <h1>快速笔记</h1>
+    <button class="dark-toggle" id="darkToggle" title="切换深色模式">🌙</button>
   </div>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="搜索笔记…" autocomplete="off">
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <span id="totalNotes">0 条笔记</span>
+    <span id="totalChars">0 字符</span>
+  </div>
+
+  <!-- Notes list -->
   <div class="notes-list" id="notesList">
-    <div class="empty" id="emptyTip">暂无笔记，添加第一条吧 ✨</div>
+    <div class="empty" id="emptyTip">暂无笔记，写下第一条吧 ✨</div>
   </div>
+
+  <!-- Input -->
   <div class="input-area">
-    <textarea id="noteInput" placeholder="写下你的想法..."></textarea>
-    <button id="addBtn">保存笔记</button>
+    <textarea id="noteInput" placeholder="写下你的想法，按 Enter 保存，Ctrl+Enter 换行…"></textarea>
+    <div class="input-footer">
+      <span class="char-count" id="inputChars">0 字符</span>
+      <button class="add-btn" id="addBtn">保存笔记</button>
+    </div>
   </div>
-  <div class="footer">Chrome Extension v1.0</div>
+
+  <!-- Action bar -->
+  <div class="action-bar">
+    <button class="action-btn" id="exportBtn">📤 导出</button>
+    <button class="action-btn" id="importBtn">📥 导入</button>
+    <button class="action-btn" id="clearAllBtn">🗑️ 清空</button>
+  </div>
+
+  <input type="file" id="importFile" accept=".json">
+
   <script src="popup.js"></script>
 </body>
 </html>

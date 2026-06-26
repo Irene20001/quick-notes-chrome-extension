@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Quick Notes",
-  "version": "1.0.0",
-  "description": "快速笔记 - 随时记录灵感与待办事项",
-  "permissions": ["storage", "activeTab"],
+  "version": "2.0.0",
+  "description": "快速笔记 - 支持搜索、深色模式、导入导出、笔记置顶",
+  "permissions": ["storage"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -15,7 +15,6 @@
   "background": {
     "service_worker": "background.js"
   },
-  "content_scripts": [],
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
