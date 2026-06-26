@@ -1,0 +1,22 @@
+﻿# Chrome extension build artifacts
+*.crx
+*.pem
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Node (if any)
+node_modules/
+
+# Local scripts (contain secrets - never commit)
+*.ps1
